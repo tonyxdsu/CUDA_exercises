@@ -1,5 +1,6 @@
 #include <stdio.h>     
 #include <stdlib.h> 
+#include <math.h>
 #include "../include/parser.h"
 
 /**
@@ -57,7 +58,7 @@ int isEqual(float* matrix1, float* matrix2, int height, int width) {
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (abs(matrix1[y * width + x] - matrix2[y * width + x]) >= MATRIX_EPSILON) {
+            if (fabs(matrix1[y * width + x] - matrix2[y * width + x]) >= MATRIX_EPSILON) {
                 return 0;
             }
         }
