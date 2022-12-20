@@ -3,6 +3,8 @@
 
 #include <stdio.h>
 
+#include "../include/vector_addition.cuh"
+
 __global__ void additionKernel(float* vector1, float* vector2, float* res) {
     int i = threadIdx.x;
     res[i] = vector1[i] + vector2[i];
