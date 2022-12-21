@@ -4,7 +4,7 @@
 #include "../include/parser.h"
 
 /**
-Parse contents of a file of floats (max 2 decimal places) representing a matrix into a linear array of floats.
+Parse contents of a file of floats representing a matrix into a linear array of floats.
 The first line of the file will specify: height width.
 Subsequent rows in the file will be rows of the matrix and each entry must be
 seperated by a space.
