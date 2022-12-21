@@ -5,14 +5,14 @@
 
 #include "../include/matrix_multiply.cuh"
 
-__global__ void multiplyKernel(float* matrix1, float* matrix2, float* res, int heightRes, int widthRes) {
+__global__ void multiplyKernel(float* matrix1, float* matrix2, float* res, int heightRes, int widthRes, int width1height2) {
     int row = blockDim.y * blockIdx.y + threadIdx.y;
     int col = blockDim.x * blockIdx.x + threadIdx.x;
 
     if (row < heightRes && col < widthRes) {
         float sum = 0;
-        for (int j = 0; j < widthRes; j++) {
-            sum += matrix1[row * widthRes + j] * matrix2[j * widthRes + col];
+        for (int j = 0; j < width1height2; j++) {
+            sum += matrix1[row * width1height2 + j] * matrix2[j * widthRes + col];
         }
         res[row * widthRes + col] = sum;
     }
@@ -64,7 +64,7 @@ void matrixMultiply(float* matrix1_h, float* matrix2_h, float* matrixCalculatedR
     dim3 dimBlock(BLOCK_DIM, BLOCK_DIM, 1);
 
     // TODO occupancy calculator
-    multiplyKernel<<<dimGrid, dimBlock>>>(matrix1_d, matrix2_d, matrixCalculatedRes_d, height1, width2);
+    multiplyKernel<<<dimGrid, dimBlock>>>(matrix1_d, matrix2_d, matrixCalculatedRes_d, height1, width2, width1);
     
     cudaStatus = cudaMemcpy(matrixCalculatedRes_h, matrixCalculatedRes_d, height1 * width2 * sizeof(float), cudaMemcpyDeviceToHost);
     if (cudaStatus != cudaSuccess) {

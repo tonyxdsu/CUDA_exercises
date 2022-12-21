@@ -21,12 +21,15 @@ int main(int argc, char** argv) {
     float* matrix2_h = parseFileToMatrix(inputFileName2, &height2, &width2);
     float* matrixExpectedRes_h = parseFileToMatrix(outputFileName, &heightRes, &widthRes);
 
-    // TODO check input matrix sizes to make sure they are multiplicable
-    // if (height1 != height2 || height1 != heightRes || 
-    //     width1  != width2  || width1  != widthRes) {
-    //     printf("Unequal input matrix sizes\n");
-    //     return 0;
-    // }
+    if (width1 != height2) {
+        printf("Cannot multiply matrices with dimensions %d by %d and %d by %d\n", height1, width1, height2, width2);
+        return 0;
+    }
+
+    if (widthRes != width2 || heightRes != height1) {
+        printf("Expected output incorrect size.\n");
+        return 0;
+    }
 
     float* matrixCalculatedRes_h = (float*) malloc(heightRes * widthRes * sizeof(float));
     matrixMultiply(matrix1_h, matrix2_h, matrixCalculatedRes_h, height1, width1, height2, width2);
