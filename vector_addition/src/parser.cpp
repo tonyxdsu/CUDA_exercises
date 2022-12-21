@@ -59,6 +59,8 @@ int isEqual(float* matrix1, float* matrix2, int height, int width) {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             if (fabs(matrix1[y * width + x] - matrix2[y * width + x]) >= MATRIX_EPSILON) {
+                printf("Result at row %d col %d is matrix1: %f\n and matrix2: %f\n", y, x, 
+                    matrix1[y * width + x], matrix2[y * width + x]);
                 return 0;
             }
         }
