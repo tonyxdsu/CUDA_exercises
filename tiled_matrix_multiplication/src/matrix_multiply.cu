@@ -9,48 +9,43 @@ __global__ void multiplyKernel(float* matrix1, float* matrix2, float* res, int h
     int row = blockDim.y * blockIdx.y + threadIdx.y;
     int col = blockDim.x * blockIdx.x + threadIdx.x;
 
-    // int remainingX = blockDim.x - widthRes % blockDim.x;
-    // int remainingY = blockDim.y - widthRes % blockDim.y;
-
     __shared__ float tile1[TILE_HEIGHT][TILE_WIDTH];
     __shared__ float tile2[TILE_WIDTH][TILE_HEIGHT];
 
     float sum = 0;
 
-    // printf("gridDim.x = %d\n", gridDim.x);
-    // printf("blockDim.x = %d\n", blockDim.x);
+    int numTilesInMatrix1Width = width1height2 / TILE_WIDTH;
+    if (width1height2 % TILE_WIDTH != 0) {
+        numTilesInMatrix1Width++;
+    }
 
-    for (int k = 0; k < width1height2 / TILE_WIDTH; k++) {
-        tile1[threadIdx.y][threadIdx.x] = matrix1[row * width1height2 + k * blockDim.x + threadIdx.x];
-        tile2[threadIdx.y][threadIdx.x] = matrix2[(k * blockDim.y + threadIdx.y) * widthRes + col]; 
+    for (int k = 0; k < numTilesInMatrix1Width; k++) {
+        if (row < heightRes && k * blockDim.x + threadIdx.x < width1height2) {
+            tile1[threadIdx.y][threadIdx.x] = matrix1[row * width1height2 + k * blockDim.x + threadIdx.x];
+        }
+        else {
+            tile1[threadIdx.y][threadIdx.x] = 0;
+        }
 
-        // printf("tidx: %d\n", threadIdx.x);
-        // printf("tidy: %d\n", threadIdx.y);
-
-        // printf("m1: %f\n", matrix1[row * width1height2 + k * blockDim.x + threadIdx.x]);
-        // printf("m2: %f\n", matrix2[(k * blockDim.y + threadIdx.y) * widthRes + col]);
+        if (k * blockDim.y + threadIdx.y < width1height2 && col < widthRes) {
+            tile2[threadIdx.y][threadIdx.x] = matrix2[(k * blockDim.y + threadIdx.y) * widthRes + col]; 
+        }
+        else {
+            tile2[threadIdx.y][threadIdx.x] = 0; 
+        }
 
         __syncthreads();
-
-        // if (threadIdx.x < remainingX && threadIdx.y < remainingY) {
+        
         for (int xTile1 = 0; xTile1 < TILE_WIDTH; xTile1++) {
             sum += tile1[threadIdx.y][xTile1] * tile2[xTile1][threadIdx.x];
         }
-        // }
 
         __syncthreads();
     }
 
-    res[row * widthRes + col] = sum;
-    
-
-    // if (row < heightRes && col < widthRes) {
-    //     float sum = 0;
-    //     for (int j = 0; j < width1height2; j++) {
-    //         sum += matrix1[row * width1height2 + j] * matrix2[j * widthRes + col];
-    //     }
-    //     res[row * widthRes + col] = sum;
-    // }
+    if (row < heightRes && col < widthRes) {
+        res[row * widthRes + col] = sum;
+    }
 }
 
 void matrixMultiply(float* matrix1_h, float* matrix2_h, float* matrixCalculatedRes_h, int height1, int width1, int height2, int width2) {
