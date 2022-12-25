@@ -1,5 +1,5 @@
 #define MAX_FIRST_LINE_LENGTH 50
-#define MATRIX_EPSILON 0.001
+#define MATRIX_EPSILON 0.01
 
 float* parseFileToMatrix(char* inputFileName, int* height, int* width);
 void printMatrix(float* matrix, int height, int width);
