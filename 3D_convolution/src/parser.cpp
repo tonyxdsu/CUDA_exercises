@@ -100,10 +100,34 @@ int isEqual(float* matrix1, float* matrix2, int height, int width) {
 
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
-            if (fabs(matrix1[y * width + x] - matrix2[y * width + x]) >= MATRIX_EPSILON) {
+            if (fabs(matrix1[y * width + x] - matrix2[y * width + x]) >= ACCURACY_EPSILON) {
                 printf("Result at row %d col %d is matrix1: %f\n and matrix2: %f\n", y, x, 
                     matrix1[y * width + x], matrix2[y * width + x]);
                 return 0;
+            }
+        }
+    }
+
+    return 1;
+}
+
+int isEqual(Tensor3D* expected, Tensor3D* test) {
+    if (expected == NULL || test == NULL) return -1;
+
+    int zDim = expected->zDim;
+    int yDim = expected->yDim;
+    int xDim = expected->xDim;
+
+    for (int z = 0; z < zDim; z++) {
+        for (int y = 0; y < yDim; y++) {
+            for (int x = 0; x < xDim; x++) {
+                float expectedElement = expected->elements[z * (yDim * xDim) + y * xDim + x];
+                float testElement = test->elements[z * (yDim * xDim) + y * xDim + x];
+                if (fabs(expectedElement - testElement) >= ACCURACY_EPSILON) {
+                    printf("Result at z = %d y = %d x = %d is expected: %f\n and test: %f\n", z, y, x, 
+                        expectedElement, testElement);
+                    return 0;
+                }
             }
         }
     }

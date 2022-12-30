@@ -1,5 +1,8 @@
+#ifndef PARSER_H
+#define PARSER_H
+
 #define MAX_FILE_LINE_LENGTH 50
-#define MATRIX_EPSILON 0.001
+#define ACCURACY_EPSILON 0.01
 
 typedef struct matrix_t {
     unsigned int width;
@@ -20,3 +23,6 @@ void freeTensor(Tensor3D* tensor);
 void printTensor(Tensor3D* tensor);
 void printMatrix(float* matrix, int height, int width);
 int isEqual(float* matrix1, float* matrix2, int height, int width);
+int isEqual(Tensor3D* expected, Tensor3D* test);
+
+#endif
