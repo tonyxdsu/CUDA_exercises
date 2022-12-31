@@ -51,7 +51,7 @@ INC_DIR = include
 EXE = run_test
 
 # Object files:
-OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/convolution.o $(OBJ_DIR)/parser.o
+OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/convolution.o $(OBJ_DIR)/tensor.o $(OBJ_DIR)/unified_memory.o
 
 ##########################################################
 
