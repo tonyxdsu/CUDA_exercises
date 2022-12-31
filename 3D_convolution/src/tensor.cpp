@@ -1,6 +1,7 @@
 #include "cuda_runtime.h"
 
-#include <stdio.h>     
+#include <stdio.h>
+#include <math.h>
 
 #include "../include/tensor.h"
 
@@ -37,6 +38,12 @@ Tensor3D::Tensor3D(char* fileName) {
     }
 }
 
+Tensor3D::~Tensor3D() {
+    // TODO error checking?
+    cudaDeviceSynchronize();
+    cudaFree(elements);
+}
+
 void Tensor3D::print() {
     for (int z = 0; z < zDim; z++) {
         printf("z = %d\n", z);
@@ -48,4 +55,26 @@ void Tensor3D::print() {
         }
         printf("\n");
     }
+}
+
+bool Tensor3D::operator==(const Tensor3D& rhs) {
+    if (xDim != rhs.xDim || yDim != rhs.yDim || zDim != rhs.zDim) {
+        return false;
+    }
+
+    for (int z = 0; z < zDim; z++) {
+        for (int y = 0; y < yDim; y++) {
+            for (int x = 0; x < xDim; x++) {
+                float lhsElement = elements[z * (yDim * xDim) + y * xDim + x];
+                float rhsElement = rhs.elements[z * (yDim * xDim) + y * xDim + x];
+                if (fabs(lhsElement - rhsElement) >= TENSOR_ACCURACY_EPSILON) {
+                    printf("Result at lhs z = %d y = %d x = %d is: %f\n and rhs is: %f\n", z, y, x, 
+                        lhsElement, rhsElement);
+                    return false;
+                }
+            }
+        }
+    }
+
+    return true;
 }

@@ -3,6 +3,8 @@
 
 #include "unified_memory.h"
 
+#define TENSOR_ACCURACY_EPSILON 0.01
+
 class Tensor3D : public UnifiedMemory {
 private:
     unsigned int xDim;
@@ -26,10 +28,16 @@ public:
     */
     Tensor3D(char* fileName);
 
+    ~Tensor3D();
+    
     void print();
-    // bool operator==(const Tensor3D& rhs);
 
-    // ~Tensor3D();
+    /**
+     * Checks if every element is equal (within TENSOR_ACCURACY_EPSILON for floating point).
+     * @param rhs comparison tensor should be equal in each dimension.
+    */
+    bool operator==(const Tensor3D& rhs);
+
 };
 
 #endif
