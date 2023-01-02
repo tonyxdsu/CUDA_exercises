@@ -6,13 +6,13 @@
 #define TENSOR_ACCURACY_EPSILON 0.01
 
 class Tensor3D : public UnifiedMemory {
-private:
+public:
     unsigned int xDim;
     unsigned int yDim;
     unsigned int zDim;
     unsigned int totalSize;
     float* elements;
-public:
+
     /** 
      * Constructs Tensor3D object with cudaMallocManaged uninitialized elements.
      * @param xDim x dimension

@@ -12,7 +12,7 @@ Tensor3D::Tensor3D(unsigned int xDim, unsigned int yDim, unsigned int zDim) {
     totalSize = xDim * yDim * zDim;
 
     // TODO error checking?
-    cudaMallocManaged(&elements, totalSize);
+    cudaMallocManaged(&elements, totalSize * sizeof(float));
     cudaDeviceSynchronize();
 }
 
@@ -30,7 +30,7 @@ Tensor3D::Tensor3D(char* fileName) {
     totalSize = xDim * yDim * zDim;
 
     // TODO error checking?
-    cudaMallocManaged(&elements, totalSize);
+    cudaMallocManaged(&elements, totalSize * sizeof(float));
     cudaDeviceSynchronize();
 
     for (int i = 0; i < totalSize; i++) {
@@ -59,6 +59,7 @@ void Tensor3D::print() {
 
 bool Tensor3D::operator==(const Tensor3D& rhs) {
     if (xDim != rhs.xDim || yDim != rhs.yDim || zDim != rhs.zDim) {
+        printf("Dimensions mismatch in operator ==\n"); 
         return false;
     }
 
