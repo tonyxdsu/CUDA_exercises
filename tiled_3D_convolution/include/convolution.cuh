@@ -4,11 +4,16 @@
 #include "tensor.h"
 
 // TODO calculate total registers available or kernel will not launch
-#define BLOCK_DIM 4
+#define TILE_DIM 4
 
-// Can accomodate widths of MAX_MASK_WIDTH or smaller
-#define MAX_MASK_WIDTH 3
-__constant__ float MASK_CONSTANT[MAX_MASK_WIDTH][MAX_MASK_WIDTH][MAX_MASK_WIDTH];
+// Can only accomodate MASK_DIM^3 mask 
+// TODO how to declare shared memory dynamically with dynamic tile size and mask width?
+#define MASK_DIM 3
+__constant__ float MASK_CONSTANT[MASK_DIM][MASK_DIM][MASK_DIM];
+
+#define MASK_RADIUS MASK_DIM / 2
+
+#define TILE_WITH_HALO_DIM TILE_DIM + 2 * MASK_RADIUS
 
 /**
  * Performs convolution on input with mask. Input must be allocated using unified memory.

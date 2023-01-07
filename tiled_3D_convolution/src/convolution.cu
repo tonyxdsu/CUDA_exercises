@@ -5,34 +5,44 @@
 
 #include "../include/convolution.cuh"
 
+/**
+ * "Strategy 2", using smaller subset of threads to calculate but all threads will load into tile.
+ * TODO Textbook version might have less redundant if statements, not sure.
+*/
+__global__ void convolutionKernel(Tensor3D* input, Tensor3D* output) {
+    int column = TILE_DIM * blockIdx.x + threadIdx.x - MASK_RADIUS;
+    int row = TILE_DIM * blockIdx.y + threadIdx.y - MASK_RADIUS;
+    int aisle = TILE_DIM * blockIdx.z + threadIdx.z - MASK_RADIUS;
 
-__global__ void convolutionKernel(Tensor3D* input, int maskRadius, Tensor3D* output) {
-    int column = blockDim.x * blockIdx.x + threadIdx.x;
-    int row = blockDim.y * blockIdx.y + threadIdx.y;
-    int aisle = blockDim.z * blockIdx.z + threadIdx.z;
+    __shared__ float tile[TILE_WITH_HALO_DIM][TILE_WITH_HALO_DIM][TILE_WITH_HALO_DIM];
 
-    // TODO no way explicitly storing input->xyzDim in variable is faster right?
-    // will be kept in register for every iteration right?
+    bool isWithinTensor = column >= 0 && column < input->xDim && row >= 0 && row < input->yDim && aisle >= 0 && aisle < input->zDim;
 
-    if (column < input->xDim && row < input->yDim && aisle < input->zDim) {
+    if (isWithinTensor) {
+        tile[threadIdx.z][threadIdx.y][threadIdx.x] = input->elements[aisle * (input->yDim * input->xDim) + row * input->xDim + column];
+    }
+    else {
+        tile[threadIdx.z][threadIdx.y][threadIdx.x] = 0;
+    }
 
+    __syncthreads();
+
+    bool isValidTileToCalculate = threadIdx.x >= MASK_RADIUS && threadIdx.x <= TILE_DIM && 
+                                  threadIdx.y >= MASK_RADIUS && threadIdx.y <= TILE_DIM && 
+                                  threadIdx.z >= MASK_RADIUS && threadIdx.z <= TILE_DIM &&
+                                  isWithinTensor;
+
+    if (isValidTileToCalculate) {
         float sum = 0;
-
-        for (int z = -maskRadius; z <= maskRadius; z++) {
-            for (int y = -maskRadius; y <= maskRadius; y++) {
-                for (int x = -maskRadius; x <= maskRadius; x++) {
-                    if (x + column >= 0 && x + column < input->xDim &&
-                        y + row >= 0 && y + row < input->yDim &&
-                        z + aisle >= 0 && z + aisle < input->zDim) {
-                        
-                        sum += input->elements[(z + aisle) * input->xDim * input->yDim + (y + row) * input->xDim + (x + column)] *
-                            MASK_CONSTANT[z + maskRadius][y + maskRadius][x + maskRadius];
-                    }
+        for (int z = -MASK_RADIUS; z <= MASK_RADIUS; z++) {
+            for (int y = -MASK_RADIUS; y <= MASK_RADIUS; y++) {
+                for (int x = -MASK_RADIUS; x <= MASK_RADIUS; x++) {
+                    sum += tile[threadIdx.z + z][threadIdx.y + y][threadIdx.x + x] * MASK_CONSTANT[z + MASK_RADIUS][y + MASK_RADIUS][x + MASK_RADIUS];
                 }
             }
         }
 
-        output->elements[aisle * input->xDim * input->yDim + row * input->xDim + column] = sum;
+        output->elements[aisle * (input->yDim * input->xDim) + row * input->xDim + column] = sum;
     }
 }
 
@@ -42,28 +52,28 @@ Tensor3D* convolution(Tensor3D* input, Tensor3D* mask) {
 
     Tensor3D* output = new Tensor3D(input->xDim, input->yDim, input->zDim);
 
-    unsigned int gridX = input->xDim / BLOCK_DIM;
-    if (input->xDim % BLOCK_DIM != 0) {
+    unsigned int gridX = input->xDim / TILE_DIM;
+    if (input->xDim % TILE_DIM != 0) {
         gridX++;
     }
 
-    unsigned int gridY = input->yDim / BLOCK_DIM;
-    if (input->yDim % BLOCK_DIM != 0) {
+    unsigned int gridY = input->yDim / TILE_DIM;
+    if (input->yDim % TILE_DIM != 0) {
         gridY++;
     }
 
-    unsigned int gridZ = input->zDim / BLOCK_DIM;
-    if (input->zDim % BLOCK_DIM != 0) {
+    unsigned int gridZ = input->zDim / TILE_DIM;
+    if (input->zDim % TILE_DIM != 0) {
         gridZ++;
     }
 
     // TODO occupancy calculation
     dim3 dimGrid(gridX, gridY, gridZ);
-    dim3 dimBlock(BLOCK_DIM, BLOCK_DIM, BLOCK_DIM);
+    dim3 dimBlock(TILE_WITH_HALO_DIM, TILE_WITH_HALO_DIM, TILE_WITH_HALO_DIM);
 
     // TODO calculate available resources (ie registers per block) or kernel does not run with no error messages
     // TODO how to get error messages for kernel not running? nvprof?
-    convolutionKernel<<<dimGrid, dimBlock>>>(input, mask->xDim / 2, output);
+    convolutionKernel<<<dimGrid, dimBlock>>>(input, output);
 
     // TODO kernel calls are async so does this function return early without synchronize?
     cudaDeviceSynchronize();
