@@ -3,13 +3,13 @@
 
 #include "tensor1D.h"
 
-#define TILE_DIM 4
+#define BLOCK_DIM 32
 
 /**
- * @brief Performs a reduction (sum) on a 1D tensor (vector).
+ * @brief Performs a reduction sum on a 1D tensor (vector).
  * @param input Assumed to be allocated on unified memory.
- * @return Result of reduction allocated on unified memory.
+ * @return 1D tensor with TODO
 */
-Tensor1D* reduction(Tensor1D* input);
+Tensor1D* reductionSum(Tensor1D* input);
 
 #endif

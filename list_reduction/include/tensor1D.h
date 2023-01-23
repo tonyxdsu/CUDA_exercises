@@ -17,7 +17,7 @@ public:
 
     /**
      * Constructs Tensor1D object with contents of the specified file.
-     * The first 3 rows of the file must specify the z, y and x dimensions respectively.
+     * The first row of the file must specify the totalSize of the tensor (vector).
      * @param fileName string specifiying the path to the file to read.
     */
     Tensor1D(char* fileName);
