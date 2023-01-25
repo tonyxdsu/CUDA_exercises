@@ -1,5 +1,5 @@
-#ifndef CONVOLUTION_CUH
-#define CONVOLUTION_CUH
+#ifndef REDUCTION_CUH
+#define REDUCTION_CUH
 
 #include "tensor1D.h"
 
