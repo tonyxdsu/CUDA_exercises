@@ -52,6 +52,7 @@ bool Tensor1D::operator==(const Tensor1D& rhs) {
 
     for (int i = 0; i < totalSize; i++) {
         if (fabs(elements[i] - rhs.elements[i]) > TENSOR_ACCURACY_EPSILON) {
+            printf("Wrong element at index %d: %f vs %f\n", i, elements[i], rhs.elements[i]);
             return false;
         }
     }
