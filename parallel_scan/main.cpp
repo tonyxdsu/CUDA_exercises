@@ -4,6 +4,7 @@
 #include "cuda_runtime.h"
 
 #include "include/prefix_sum.cuh"
+#include "include/kogge_stone.cuh"
 #include "include/tensor1D.h"
 
 int main(int argc, char** argv) {
@@ -19,8 +20,9 @@ int main(int argc, char** argv) {
     // TODO can prefetch to GPU after creation of each Tensor to move data while reading next file?
     Tensor1D* input = new Tensor1D(inputFileName);
     Tensor1D* expectedOutput = new Tensor1D(outputFileName);
-    Tensor1D* calculatedOutput = prefixSumBrentKung(input);
+    Tensor1D* calculatedOutput = blockPrefixSumsKoggeStone(input);
     
+
     if (*calculatedOutput == *expectedOutput) {
         printf("Correct\n");
     }

@@ -47,6 +47,7 @@ void Tensor1D::print() {
 
 bool Tensor1D::operator==(const Tensor1D& rhs) {
     if (totalSize != rhs.totalSize) {
+        printf("Wrong size: %d vs %d\n", totalSize, rhs.totalSize);
         return false;
     }
 
