@@ -11,6 +11,6 @@
  * @param input Assumed to be allocated on unified memory.
  * @return Vector with index i being the sum of the first i elements of input. Allocated on unified memory.
  */
-Tensor1D* prefixSum(Tensor1D* input);
+Tensor1D<float>* prefixSum(Tensor1D<float>* input);
 
 #endif

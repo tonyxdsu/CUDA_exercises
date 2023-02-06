@@ -18,9 +18,9 @@ int main(int argc, char** argv) {
     char* outputFileName = argv[2];
 
     // TODO can prefetch to GPU after creation of each Tensor to move data while reading next file?
-    Tensor1D* input = new Tensor1D(inputFileName);
-    Tensor1D* expectedOutput = new Tensor1D(outputFileName);
-    Tensor1D* calculatedOutput = prefixSum(input);
+    Tensor1D<float>* input = new Tensor1D<float>(inputFileName);
+    Tensor1D<float>* expectedOutput = new Tensor1D<float>(outputFileName);
+    Tensor1D<float>* calculatedOutput = prefixSum(input);
     
 
     if (*calculatedOutput == *expectedOutput) {

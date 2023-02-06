@@ -9,7 +9,7 @@
 /**
  * TODO can I pass in a function pointer to a kernel to perform different operations?
 */
-__global__ void blockPrefixSumsKoggeStone(Tensor1D* input, Tensor1D* output) {
+__global__ void blockPrefixSumsKoggeStone(Tensor1D<float>* input, Tensor1D<float>* output) {
     int start = blockIdx.x * blockDim.x;
     int tid   = threadIdx.x; // otherwise need to typecast before comparison with 0
 
@@ -47,8 +47,8 @@ __global__ void blockPrefixSumsKoggeStone(Tensor1D* input, Tensor1D* output) {
     output->elements[start + tid] = tempSumsBufferPtr2[tid];
 }
 
-Tensor1D* blockPrefixSumsKoggeStone(Tensor1D* input) {
-    Tensor1D* output = new Tensor1D(input->totalSize);
+Tensor1D<float>* blockPrefixSumsKoggeStone(Tensor1D<float>* input) {
+    Tensor1D<float>* output = new Tensor1D<float>(input->totalSize);
     
     dim3 dimBlock(BLOCK_DIM, 1, 1);
     

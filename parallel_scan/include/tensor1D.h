@@ -5,10 +5,13 @@
 
 #define TENSOR_ACCURACY_EPSILON 0.01
 
+template <typename T>
 class Tensor1D : public UnifiedMemory {
+private:
+    static const char* fmt; // for format string
 public:
     unsigned int totalSize;
-    float* elements;
+    T* elements;
 
     /** 
      * Constructs Tensor1D object with cudaMallocManaged uninitialized elements.

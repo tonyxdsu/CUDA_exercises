@@ -8,6 +8,6 @@
  * @param input Assumed to be allocated on unified memory.
  * @return Vector of prefix sums in each block. Allocated on unified memory.
  */
-Tensor1D* blockPrefixSumsKoggeStone(Tensor1D* input);
+Tensor1D<float>* blockPrefixSumsKoggeStone(Tensor1D<float>* input);
 
 #endif

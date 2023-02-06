@@ -2,18 +2,21 @@
 
 #include <stdio.h>
 #include <math.h>
+#include <iostream>
 
 #include "../include/tensor1D.h"
 
-Tensor1D::Tensor1D(unsigned int totalSize) {
+template <typename T>
+Tensor1D<T>::Tensor1D(unsigned int totalSize) {
     this->totalSize = totalSize;
 
     // TODO error checking?
-    cudaMallocManaged(&elements, totalSize * sizeof(float));
+    cudaMallocManaged(&elements, totalSize * sizeof(T));
     cudaDeviceSynchronize();
 }
 
-Tensor1D::Tensor1D(char* fileName) {
+template <typename T>
+Tensor1D<T>::Tensor1D(char* fileName) {
     FILE* inputFile = fopen(fileName, "r");
 
     if (inputFile == NULL) {
@@ -28,24 +31,27 @@ Tensor1D::Tensor1D(char* fileName) {
     cudaDeviceSynchronize();
 
     for (int i = 0; i < totalSize; i++) {
-        fscanf(inputFile, "%f", &elements[i]);
+        fscanf(inputFile, fmt, &elements[i]);
     }
 }
 
-Tensor1D::~Tensor1D() {
+template <typename T>
+Tensor1D<T>::~Tensor1D() {
     // TODO error checking?
     cudaDeviceSynchronize();
     cudaFree(elements);
 }
 
-void Tensor1D::print() {
+template <typename T>
+void Tensor1D<T>::print() {
     for (int i = 0; i < totalSize; i++) {
-        printf("%f ", elements[i]);
+        std::cout << elements[i] << " ";
     }
     printf("\n");
 }
 
-bool Tensor1D::operator==(const Tensor1D& rhs) {
+template <typename T>
+bool Tensor1D<T>::operator==(const Tensor1D<T>& rhs) {
     if (totalSize != rhs.totalSize) {
         printf("Wrong size: %d vs %d\n", totalSize, rhs.totalSize);
         return false;
@@ -53,10 +59,16 @@ bool Tensor1D::operator==(const Tensor1D& rhs) {
 
     for (int i = 0; i < totalSize; i++) {
         if (fabs(elements[i] - rhs.elements[i]) > TENSOR_ACCURACY_EPSILON) {
-            printf("Wrong element at index %d: %f vs %f\n", i, elements[i], rhs.elements[i]);
+            printf("Wrong value at index %d: %f vs %f\n", i, elements[i], rhs.elements[i]);
             return false;
         }
     }
 
     return true;
 }
+
+template class Tensor1D<float>;
+template class Tensor1D<unsigned int>;
+
+template<> const char* Tensor1D<unsigned int>::fmt = "%u";
+template<> const char* Tensor1D<float>::fmt = "%f";
