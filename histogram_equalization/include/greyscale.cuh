@@ -2,8 +2,10 @@
 #define GREYSCALE_CUH
 
 #include "ppm_image.h"
+#include "tensor1D.h"
+
 #define BLOCK_DIM 32
 
-unsigned char* toGreyscaleValues(PPMImage* input);
+Tensor1D<unsigned char>* toGreyscaleValues(PPMImage* input);
 
 #endif

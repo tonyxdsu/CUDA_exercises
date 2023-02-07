@@ -3,8 +3,9 @@
 
 #include "../include/greyscale.cuh"
 #include "../include/ppm_image.h"
+#include "../include/tensor1D.h"
 
-__global__ void greyscaleKernel(PPMImage* input, unsigned char* output) {
+__global__ void greyscaleKernel(PPMImage* input, Tensor1D<unsigned char>* output) {
     int row = blockDim.y * blockIdx.y + threadIdx.y;
     int col = blockDim.x * blockIdx.x + threadIdx.x;
     int index = row * input->width + col;
@@ -13,15 +14,12 @@ __global__ void greyscaleKernel(PPMImage* input, unsigned char* output) {
         unsigned char r = input->data[3 * index];
         unsigned char g = input->data[3 * index + 1];
         unsigned char b = input->data[3 * index + 2];
-        output[index] = (unsigned char) (0.21 * r + 0.71 * g + 0.07 * b);
+        output->elements[index] = (unsigned char) (0.21 * r + 0.71 * g + 0.07 * b);
     }
 }
 
-unsigned char* toGreyscaleValues(PPMImage* input) {
-    // TODO greyscale image does not need 3 channels
-    unsigned char* output = 0;
-    cudaMallocManaged(&output, input->width * input->height * sizeof(unsigned char));
-    cudaDeviceSynchronize();
+Tensor1D<unsigned char>* toGreyscaleValues(PPMImage* input) {
+    Tensor1D<unsigned char>* output = new Tensor1D<unsigned char>(input->width * input->height);
 
     unsigned int gridX = input->width / BLOCK_DIM;
     if (input->width % BLOCK_DIM != 0) {
