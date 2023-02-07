@@ -11,8 +11,10 @@ PPMImage::PPMImage(unsigned int width, unsigned int height) : width(width), heig
     // TODO error checking?
     cudaMallocManaged(&data, width * height * 3 * sizeof(unsigned char));
     cudaDeviceSynchronize();
-
-    // TODO initialize data to zero?
+    // TODO don't need to initialize but will do for testing
+    for (int i = 0; i < width * height * 3; i++) {
+        data[i] = 0;
+    }
 }
 
 PPMImage::PPMImage(const std::string& fileName) {
@@ -93,8 +95,9 @@ void PPMImage::print() {
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             int index = (y * width + x) * 3;
-            std::cout << (int)data[index + 0] << " " << (int)data[index + 1] << " " << (int)data[index + 2] << std::endl;
+            std::cout << (int)data[index + 0] << " " << (int)data[index + 1] << " " << (int)data[index + 2] << " ";
         }
+        std::cout << std::endl;
     }
 }
 
