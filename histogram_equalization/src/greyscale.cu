@@ -21,18 +21,18 @@ __global__ void greyscaleKernel(PPMImage* input, Tensor1D<unsigned char>* output
 Tensor1D<unsigned char>* toGreyscaleValues(PPMImage* input) {
     Tensor1D<unsigned char>* output = new Tensor1D<unsigned char>(input->width * input->height);
 
-    unsigned int gridX = input->width / BLOCK_DIM;
-    if (input->width % BLOCK_DIM != 0) {
+    unsigned int gridX = input->width / BLOCK_DIM_GREYSCALE;
+    if (input->width % BLOCK_DIM_GREYSCALE != 0) {
         gridX++;
     }
 
-    unsigned int gridY = input->height / BLOCK_DIM;
-    if (input->height % BLOCK_DIM != 0) {
+    unsigned int gridY = input->height / BLOCK_DIM_GREYSCALE;
+    if (input->height % BLOCK_DIM_GREYSCALE != 0) {
         gridY++;
     }
 
     dim3 dimGrid(gridX, gridY, 1);
-    dim3 dimBlock(BLOCK_DIM, BLOCK_DIM, 1);
+    dim3 dimBlock(BLOCK_DIM_GREYSCALE, BLOCK_DIM_GREYSCALE, 1);
 
     greyscaleKernel<<<dimGrid, dimBlock>>>(input, output);
 

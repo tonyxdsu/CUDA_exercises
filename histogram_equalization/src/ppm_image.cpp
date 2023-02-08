@@ -127,15 +127,30 @@ bool PPMImage::operator==(const PPMImage& rhs) {
         return false;
     }
 
+    int maxPixelDifference = 0;
+    int numPixelsDifferent = 0;
+
     for (int y = 0; y < height; y++) {
         for (int x = 0; x < width; x++) {
             int index = (y * width + x) * 3;
             for (int i = 0; i < 3; i++) {
                 if (data[index + i] != rhs.data[index + i]) {
-                    return false;
+                    int pixelDifference = abs(data[index + i] - rhs.data[index + i]);
+                    if (pixelDifference > maxPixelDifference) {
+                        maxPixelDifference = pixelDifference;
+                    }
+                    numPixelsDifferent++;
+                    printf("Pixel difference at (%d, %d) is %d\n", x, y, pixelDifference);
+                    printf("Expected: %d, Actual: %d\n", rhs.data[index + i], data[index + i]);
                 }
             }
         }
+    }
+
+    if (maxPixelDifference > 0) {
+        printf("Number of pixels different is %d\n", numPixelsDifferent);
+        printf("Max pixel difference is %d\n", maxPixelDifference);
+        return false;
     }
 
     return true;
