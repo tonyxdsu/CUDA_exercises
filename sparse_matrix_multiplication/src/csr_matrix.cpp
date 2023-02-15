@@ -44,7 +44,7 @@ CSRMatrix<T>::CSRMatrix(char* dataFileName, char* rowPtrFileName, char* colIndFi
 
     // TODO error checking?
     cudaMallocManaged(&data, numDataElements * sizeof(T));
-    cudaMallocManaged(&rowPtr, numRows * sizeof(unsigned int));
+    cudaMallocManaged(&rowPtr, (numRows + 1) * sizeof(unsigned int));
     cudaMallocManaged(&colInd, numDataElements * sizeof(unsigned int));
     cudaDeviceSynchronize();
 
@@ -79,9 +79,7 @@ void CSRMatrix<T>::print() {
 }
 
 template class CSRMatrix<float>;
-template class CSRMatrix<unsigned int>;
-template class CSRMatrix<unsigned char>;
+template class CSRMatrix<int>;
 
-template<> const char* CSRMatrix<unsigned int>::fmt = "%u";
 template<> const char* CSRMatrix<float>::fmt = "%f";
-template<> const char* CSRMatrix<unsigned char>::fmt = "%hhu";
+template<> const char* CSRMatrix<int>::fmt = "%d";
