@@ -32,7 +32,7 @@ void spmvCSR(const CSRMatrix<T>* mat, const Tensor1D<T>* vec, Tensor1D<T>* res) 
     dim3 gridDim(gridX, 1, 1);
     dim3 blockDim(BLOCK_DIM_CSR, 1, 1);
 
-    spmvCSRKernel<<<gridDim, blockDim>>>(mat, vec, res);
+    spmvCSRKernel<float><<<gridDim, blockDim>>>(mat, vec, res);
 
     cudaDeviceSynchronize();
 }
