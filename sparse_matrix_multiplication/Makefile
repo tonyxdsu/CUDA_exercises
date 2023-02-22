@@ -51,7 +51,7 @@ INC_DIR = include
 EXE = run_test
 
 # Object files:
-OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/csr_matrix.o $(OBJ_DIR)/tensor1D.o $(OBJ_DIR)/spmv_csr.o $(OBJ_DIR)/unified_memory.o
+OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/csr_matrix.o $(OBJ_DIR)/jds_matrix.o $(OBJ_DIR)/tensor1D.o $(OBJ_DIR)/spmv_csr.o $(OBJ_DIR)/spmv_jds.o $(OBJ_DIR)/unified_memory.o
 
 ##########################################################
 

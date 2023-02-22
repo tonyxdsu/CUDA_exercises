@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <algorithm>
 
 #include "cuda_runtime.h"
 
 #include "include/spmv_csr.cuh"
+#include "include/spmv_jds.cuh"
 
 #include "include/csr_matrix.h"
+#include "include/jds_matrix.h"
 #include "include/tensor1D.h"
 
 int main(int argc, char** argv) {
@@ -24,8 +27,9 @@ int main(int argc, char** argv) {
     Tensor1D<float>* vec = new Tensor1D<float>(vectorFileName);
     Tensor1D<float>* res = new Tensor1D<float>(csrMat->numRows);
     Tensor1D<float>* testRes = new Tensor1D<float>(testResultFileName);
+    JDSMatrix<float>* jdsMat = new JDSMatrix<float>(*csrMat);
 
-    spmvCSR<float>(csrMat, vec, res);
+    spmvJDS<float>(jdsMat, vec, res);
 
     if (*res == *testRes) {
         printf("Test passed!\n");
@@ -33,6 +37,7 @@ int main(int argc, char** argv) {
         printf("Test failed!\n");
     }
 
+    delete jdsMat;
     delete csrMat;
     delete vec;
     delete res;
