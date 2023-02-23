@@ -14,9 +14,9 @@ private:
 
 public:
     T* data;
-    unsigned int* rowPtr; // not storing indices of 0 rows at the end 
+    unsigned int* rowPtr;
     unsigned int* colInd;
-    unsigned int* rowPerm; // not storing indices of 0 rows at the end
+    unsigned int* rowPerm; 
     unsigned int numRows;
     unsigned int numDataElements;
 
@@ -29,7 +29,8 @@ public:
     // JDSMatrix(char* dataFileName, char* rowPtrFileName, char* colIndFileName);
 
     /**
-     * 
+     * Constructs JDSMatrix object from CSRMatrix object.
+     * O(nlogn) time complexity to sort each row by length.
     */
    JDSMatrix(const CSRMatrix<T>& csrMatrix);
 

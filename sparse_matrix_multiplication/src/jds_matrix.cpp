@@ -16,7 +16,6 @@
 //     FILE* rowPtrFile = fopen(rowPtrFileName, "r");
 //     FILE* colIndFile = fopen(colIndFileName, "r");
 
-
 //     if (dataFile == NULL) {
 //         fprintf(stderr, "%s cannot be opened\n", dataFileName);
 //         return;
@@ -86,6 +85,7 @@ JDSMatrix<T>::~JDSMatrix() {
     cudaFree(data);
     cudaFree(rowPtr);
     cudaFree(colInd);
+    cudaFree(rowPerm);
 }
 
 /**
@@ -94,8 +94,8 @@ JDSMatrix<T>::~JDSMatrix() {
 */
 template <typename T>
 void JDSMatrix<T>::convertCSRToJDS(T* dataCSR, const unsigned int* rowPtrCSR, const unsigned int* colIndCSR, const unsigned int numRowsCSR, const unsigned int numDataElementsCSR) {
-    int lengthOfRowsForEachElementInData[numDataElementsCSR];
-    int rowIndexforEachElementInData[numDataElementsCSR];
+    unsigned int* lengthOfRowsForEachElementInData = new unsigned int[numDataElementsCSR];
+    unsigned int* rowIndexforEachElementInData = new unsigned int[numDataElementsCSR];
 
     for (int r = 0; r < numRowsCSR; r++) {
         for (int i = rowPtrCSR[r]; i < rowPtrCSR[r + 1]; i++) {
@@ -105,10 +105,10 @@ void JDSMatrix<T>::convertCSRToJDS(T* dataCSR, const unsigned int* rowPtrCSR, co
     }
 
     // ie) 
-    // dataCSR = {3, 1, 2, 4, 1, 1, 1}
-    // rowPtrCSR = {0, 2, 2, 5, 7}
+    // dataCSR      = {3, 1, 2, 4, 1, 1, 1}
+    // rowPtrCSR    = {0, 2, 2, 5, 7}
     // lengthOfRowsForEachElementInData = {2, 2, 3, 3, 3, 1, 1}
-    // rowIndexforEachElementInData = {0, 0, 2, 2, 2, 3, 3}
+    // rowIndexforEachElementInData     = {0, 0, 2, 2, 2, 3, 3}
 
     // sort indices by length of rows
     std::vector<int> indices(numDataElementsCSR);
@@ -122,7 +122,7 @@ void JDSMatrix<T>::convertCSRToJDS(T* dataCSR, const unsigned int* rowPtrCSR, co
     // indices after sorting =  {2, 3, 4, 0, 1, 5, 6}
 
     // apply indices to this.data, this.colInd and permutedRowIndexforEachElementInData
-    int permutedRowIndexforEachElementInData[numDataElementsCSR];
+    unsigned int* permutedRowIndexforEachElementInData = new unsigned int[numDataElementsCSR];
     for (int i = 0; i < numDataElementsCSR; i++) {
         data[i] = dataCSR[indices[i]];
         colInd[i] = colIndCSR[indices[i]];
@@ -171,6 +171,10 @@ void JDSMatrix<T>::convertCSRToJDS(T* dataCSR, const unsigned int* rowPtrCSR, co
             idxRowPerm++;
         }
     }
+
+    delete lengthOfRowsForEachElementInData;
+    delete rowIndexforEachElementInData;
+    delete permutedRowIndexforEachElementInData;
 
     /**
      * TODO
